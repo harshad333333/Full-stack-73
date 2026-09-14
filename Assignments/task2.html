@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Styled Webpage</title>
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+
+            font-family:Arial, sans-serif;
+
+            background:linear-gradient(to right,#74ebd5,#9face6);
+
+        }
+
+        header{
+
+            background:#003366;
+
+            color:white;
+
+            text-align:center;
+
+            padding:25px;
+
+            text-shadow:2px 2px 5px black;
+
+        }
+
+        nav{
+
+            background:#222;
+
+            padding:15px;
+
+            text-align:center;
+
+        }
+
+        nav a{
+
+            color:white;
+
+            text-decoration:none;
+
+            margin:20px;
+
+            font-size:18px;
+
+            font-weight:bold;
+
+            transition:0.3s;
+
+        }
+
+        nav a:hover{
+
+            color:yellow;
+
+            text-decoration:underline;
+
+        }
+
+        .canvas-section{
+
+            text-align:center;
+
+            margin:30px;
+
+        }
+
+        canvas{
+
+            border:3px solid black;
+
+            background:white;
+
+            border-radius:10px;
+
+            box-shadow:5px 5px 15px gray;
+
+        }
+
+        .container{
+
+            display:flex;
+
+            justify-content:space-around;
+
+            flex-wrap:wrap;
+
+            margin:30px;
+
+        }
+
+        .card{
+
+            width:300px;
+
+            background:white;
+
+            padding:20px;
+
+            margin:15px;
+
+            border:2px solid #333;
+
+            border-radius:15px;
+
+            box-shadow:5px 5px 15px gray;
+
+            text-align:center;
+
+        }
+
+        .card h2{
+
+            color:#003366;
+
+            margin-bottom:15px;
+
+            text-shadow:1px 1px 2px gray;
+
+        }
+
+        .card p{
+
+            font-size:16px;
+
+            line-height:1.5;
+
+        }
+
+        button{
+
+            margin-top:15px;
+
+            padding:10px 20px;
+
+            background:#003366;
+
+            color:white;
+
+            border:none;
+
+            border-radius:8px;
+
+            cursor:pointer;
+
+            transition:0.3s;
+
+        }
+
+        button:hover{
+
+            background:green;
+
+            transform:scale(1.1);
+
+        }
+
+        footer{
+
+            background:#003366;
+
+            color:white;
+
+            text-align:center;
+
+            padding:20px;
+
+            margin-top:30px;
+
+            text-shadow:2px 2px 5px black;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<header>
+
+<h1>My Styled Webpage</h1>
+
+<p>HTML5 Graphics and CSS3 Web Styling</p>
+
+</header>
+
+<nav>
+
+<a href="#">Home</a>
+
+<a href="#">About</a>
+
+<a href="#">Services</a>
+
+<a href="#">Gallery</a>
+
+<a href="#">Contact</a>
+
+</nav>
+
+<section class="canvas-section">
+
+<h2>HTML5 Canvas Demo</h2>
+
+<canvas id="myCanvas" width="500" height="300"></canvas>
+
+</section>
+
+<section class="container">
+
+<div class="card">
+
+<h2>HTML5</h2>
+
+<p>
+
+HTML5 provides semantic elements, multimedia support, forms,
+canvas, audio, video and many modern web features.
+
+</p>
+
+<button>Read More</button>
+
+</div>
+
+<div class="card">
+
+<h2>CSS3</h2>
+
+<p>
+
+CSS3 is used to style web pages using colors, borders,
+animations, gradients, shadows and responsive layouts.
+
+</p>
+
+<button>Learn CSS</button>
+
+</div>
+
+<div class="card">
+
+<h2>JavaScript</h2>
+
+<p>
+
+JavaScript makes web pages interactive by handling events,
+validating forms and manipulating HTML elements.
+
+</p>
+
+<button>Explore JS</button>
+
+</div>
+
+</section>
+
+<footer>
+
+<h3>Designed by Harsha Bodala</h3>
+
+<p>&copy; 2026 My Styled Webpage | All Rights Reserved</p>
+
+</footer>
+
+<script>
+
+var canvas=document.getElementById("myCanvas");
+
+var ctx=canvas.getContext("2d");
+
+
+// Rectangle
+
+ctx.fillStyle="blue";
+
+ctx.fillRect(20,20,150,80);
+
+
+// Circle
+
+ctx.beginPath();
+
+ctx.arc(280,60,40,0,2*Math.PI);
+
+ctx.fillStyle="red";
+
+ctx.fill();
+
+
+// Line
+
+ctx.beginPath();
+
+ctx.moveTo(50,150);
+
+ctx.lineTo(450,150);
+
+ctx.strokeStyle="green";
+
+ctx.lineWidth=4;
+
+ctx.stroke();
+
+
+// Text
+
+ctx.font="30px Arial";
+
+ctx.fillStyle="black";
+
+ctx.fillText("Harsha Bodala",120,240);
+
+</script>
+
+</body>
+
+</html>
