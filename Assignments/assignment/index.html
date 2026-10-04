@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CollegeDB - Student Information & MongoDB Operations Studio</title>
+  <meta name="description" content="Interactive MongoDB Student Management System demonstrating all 12 database operations, CRUD workflows, and Indexing performance benchmark.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <header class="navbar" id="main-header">
+    <div class="nav-brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 32 32" width="28" height="28" fill="none">
+          <path d="M16 2L3 9L16 16L29 9L16 2Z" fill="url(#brand-grad-1)"/>
+          <path d="M3 16L16 23L29 16" stroke="#00ED64" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M3 23L16 30L29 23" stroke="#00E5FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs>
+            <linearGradient id="brand-grad-1" x1="3" y1="2" x2="29" y2="16" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#00ED64"/>
+              <stop offset="1" stop-color="#00684A"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-title">CollegeDB Studio</span>
+        <span class="db-badge">MongoDB v7.0 • collegeDB.students</span>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs" id="nav-tabs">
+      <button class="nav-tab active" data-tab="directory" id="tab-btn-directory">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Student Directory
+      </button>
+      <button class="nav-tab" data-tab="lab-tasks" id="tab-btn-tasks">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        12 Lab Tasks Runner
+      </button>
+      <button class="nav-tab" data-tab="indexing-demo" id="tab-btn-indexing">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/><path d="M16 16l4 4"/></svg>
+        Indexing Benchmark (IXSCAN)
+      </button>
+      <button class="nav-tab" data-tab="raw-queries" id="tab-btn-queries">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        MongoDB Shell Script
+      </button>
+    </nav>
+
+    <div class="nav-actions">
+      <button class="btn btn-outline" id="btn-seed-data" title="Reload original student sample set">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+        Reset / Seed DB
+      </button>
+      <button class="btn btn-primary" id="btn-open-add-modal">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Student
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-content">
+    <!-- Live Database Banner & Metrics -->
+    <section class="metrics-grid" id="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-icon green">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">Total Students</span>
+          <span class="metric-value" id="stat-total-students">8</span>
+          <span class="metric-sub">documents in collection</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon cyan">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">Average Marks</span>
+          <span class="metric-value" id="stat-avg-marks">82.3%</span>
+          <span class="metric-sub">Class Performance</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon purple">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">Highest Score</span>
+          <span class="metric-value" id="stat-top-marks">95</span>
+          <span class="metric-sub" id="stat-top-student">Meera Patel (23DS007)</span>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon amber">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">Index Status</span>
+          <span class="metric-value status-badge" id="stat-index-badge">rollNo_1 Active</span>
+          <span class="metric-sub" id="stat-index-details">B-Tree Unique Index</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 1: Student Directory -->
+    <div class="tab-pane active" id="pane-directory">
+      <!-- Search & Filters Toolbar -->
+      <div class="toolbar-card">
+        <div class="search-input-group">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="filter-search-input" placeholder="Search by Roll No (e.g. 23CM001), Name, or Email..." autocomplete="off">
+          <button class="clear-search-btn" id="btn-clear-search" title="Clear search">✕</button>
+        </div>
+
+        <div class="filter-controls">
+          <div class="select-group">
+            <label for="filter-branch-select">Branch:</label>
+            <select id="filter-branch-select">
+              <option value="ALL">All Branches</option>
+              <option value="CSE-AIML">CSE-AIML</option>
+              <option value="CSE">CSE</option>
+              <option value="CSE-DS">CSE-DS</option>
+              <option value="ECE">ECE</option>
+              <option value="IT">IT</option>
+            </select>
+          </div>
+
+          <div class="select-group">
+            <label for="filter-year-select">Year:</label>
+            <select id="filter-year-select">
+              <option value="ALL">All Years</option>
+              <option value="1">1st Year</option>
+              <option value="2">2nd Year</option>
+              <option value="3">3rd Year</option>
+              <option value="4">4th Year</option>
+            </select>
+          </div>
+
+          <div class="select-group">
+            <label for="filter-marks-preset">Marks:</label>
+            <select id="filter-marks-preset">
+              <option value="ALL">Any Marks</option>
+              <option value="gt75">&gt; 75 Marks</option>
+              <option value="gte80">&gt;= 80 Marks</option>
+              <option value="gte90">&gt;= 90 Marks</option>
+            </select>
+          </div>
+
+          <div class="select-group">
+            <label for="filter-sort-select">Sort By:</label>
+            <select id="filter-sort-select">
+              <option value="marks-desc">Marks: High to Low (marks: -1)</option>
+              <option value="marks-asc">Marks: Low to High (marks: 1)</option>
+              <option value="roll-asc">Roll No: Ascending</option>
+              <option value="name-asc">Name: A to Z</option>
+            </select>
+          </div>
+
+          <button class="btn btn-secondary" id="btn-reset-filters" title="Reset all search filters">
+            Reset Filters
+          </button>
+        </div>
+      </div>
+
+      <!-- Active Query Indicator -->
+      <div class="query-preview-banner" id="query-preview-banner">
+        <div class="query-preview-left">
+          <span class="terminal-tag">MongoDB Shell Equivalent:</span>
+          <code class="query-code" id="current-query-code">db.students.find().pretty()</code>
+        </div>
+        <button class="copy-query-btn" id="btn-copy-live-query" title="Copy MongoDB command to clipboard">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy Query
+        </button>
+      </div>
+
+      <!-- Students Table View -->
+      <div class="table-container">
+        <div class="table-header-row">
+          <h2 class="section-title">Students Collection <span class="badge" id="results-count-badge">8 records</span></h2>
+          <div class="view-switch">
+            <button class="btn-icon active" id="view-mode-table" title="Table View">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+            </button>
+            <button class="btn-icon" id="view-mode-cards" title="Cards View">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="students-table-wrapper">
+          <table class="students-table" id="students-table">
+            <thead>
+              <tr>
+                <th>Roll No</th>
+                <th>Full Name</th>
+                <th>Branch</th>
+                <th>Year</th>
+                <th>Marks</th>
+                <th>Email Address</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="students-tbody">
+              <!-- Rendered via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Cards View (Hidden by default) -->
+        <div class="students-card-grid hidden" id="students-card-grid">
+          <!-- Rendered via JavaScript -->
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state hidden" id="empty-state">
+          <div class="empty-icon">🔍</div>
+          <h3>No Student Records Found</h3>
+          <p>No documents match your query filters. Try resetting the search or filter criteria.</p>
+          <button class="btn btn-outline" id="btn-empty-reset">Clear Filters</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: 12 Lab Tasks Quick-Runner -->
+    <div class="tab-pane" id="pane-lab-tasks">
+      <div class="tasks-container">
+        <div class="tasks-sidebar">
+          <div class="tasks-sidebar-header">
+            <h3>Lab Requirements</h3>
+            <p>Select any requirement to run its query live:</p>
+          </div>
+          <div class="task-list" id="task-list">
+            <button class="task-item active" data-task="1">
+              <span class="task-num">01</span>
+              <span class="task-name">Insert Student Records</span>
+            </button>
+            <button class="task-item" data-task="2">
+              <span class="task-num">02</span>
+              <span class="task-name">Display All Students</span>
+            </button>
+            <button class="task-item" data-task="3">
+              <span class="task-num">03</span>
+              <span class="task-name">Filter by Branch (CSE-AIML)</span>
+            </button>
+            <button class="task-item" data-task="4">
+              <span class="task-num">04</span>
+              <span class="task-name">Marks &gt; 75 ($gt)</span>
+            </button>
+            <button class="task-item" data-task="5">
+              <span class="task-num">05</span>
+              <span class="task-name">Search Student by rollNo</span>
+            </button>
+            <button class="task-item" data-task="6">
+              <span class="task-num">06</span>
+              <span class="task-name">Condition: Year 3 & Marks &gt;= 80</span>
+            </button>
+            <button class="task-item" data-task="7">
+              <span class="task-num">07</span>
+              <span class="task-name">Update Student Marks</span>
+            </button>
+            <button class="task-item" data-task="8">
+              <span class="task-num">08</span>
+              <span class="task-name">Update Email & Branch</span>
+            </button>
+            <button class="task-item" data-task="9">
+              <span class="task-num">09</span>
+              <span class="task-name">Delete Student Record</span>
+            </button>
+            <button class="task-item" data-task="10">
+              <span class="task-num">10</span>
+              <span class="task-name">Sort Descending by Marks</span>
+            </button>
+            <button class="task-item" data-task="11">
+              <span class="task-num">11</span>
+              <span class="task-name">Create Index on rollNo</span>
+            </button>
+            <button class="task-item" data-task="12">
+              <span class="task-num">12</span>
+              <span class="task-name">Demonstrate Indexing Usefulness</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="task-detail-pane">
+          <div class="task-detail-header">
+            <div>
+              <span class="task-badge" id="task-detail-badge">Requirement 1</span>
+              <h2 class="task-detail-title" id="task-detail-title">Insert Student Records into Collection</h2>
+              <p class="task-detail-desc" id="task-detail-desc">Inserts document records into collegeDB.students matching the schema.</p>
+            </div>
+            <button class="btn btn-primary" id="btn-execute-task">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Execute Query
+            </button>
+          </div>
+
+          <!-- Code Box -->
+          <div class="code-box">
+            <div class="code-box-header">
+              <span class="code-lang">MongoDB Shell (mongosh)</span>
+              <button class="copy-query-btn" id="btn-copy-task-code">Copy Command</button>
+            </div>
+            <pre><code id="task-code-display">// Loading...</code></pre>
+          </div>
+
+          <!-- Execution Result Output -->
+          <div class="result-box">
+            <div class="result-box-header">
+              <span class="result-title">Query Execution Output</span>
+              <span class="result-time" id="task-exec-time">Execution: 0.18 ms</span>
+            </div>
+            <div class="result-content" id="task-output-display">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: Indexing Visualizer & Performance Benchmark -->
+    <div class="tab-pane" id="pane-indexing-demo">
+      <div class="indexing-dashboard">
+        <!-- Indexing Intro Banner -->
+        <div class="index-hero">
+          <div class="index-hero-text">
+            <h2>Why Indexing is Essential in MongoDB</h2>
+            <p>Without an index, MongoDB performs a <strong>Collection Scan (COLLSCAN)</strong>, reading every single document from disk. With an index on <code>rollNo</code>, MongoDB performs an <strong>Index Scan (IXSCAN)</strong> using a balanced B-Tree, jumping straight to the document in <strong>O(log N)</strong> time.</p>
+          </div>
+          <div class="index-toggle-card">
+            <div class="index-toggle-info">
+              <span class="label">Index on <code>rollNo</code>:</span>
+              <span class="val" id="index-toggle-state">ENABLED (Unique)</span>
+            </div>
+            <button class="btn btn-outline" id="btn-toggle-index">Drop / Toggle Index</button>
+          </div>
+        </div>
+
+        <!-- Benchmark Simulation Playground -->
+        <div class="benchmark-studio">
+          <div class="benchmark-controls">
+            <div class="control-row">
+              <div class="slider-control">
+                <label for="dataset-size-slider">Simulate Dataset Size: <strong id="dataset-size-val">50,000</strong> students</label>
+                <input type="range" id="dataset-size-slider" min="1000" max="200000" step="1000" value="50000">
+              </div>
+              <div class="search-target">
+                <label for="benchmark-target-roll">Search Target rollNo:</label>
+                <input type="text" id="benchmark-target-roll" value="23CM001">
+              </div>
+              <button class="btn btn-primary" id="btn-run-benchmark">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Run ExecutionStats Benchmark
+              </button>
+            </div>
+          </div>
+
+          <!-- Comparison Side-by-Side Cards -->
+          <div class="benchmark-comparison-grid">
+            <!-- COLLSCAN Card -->
+            <div class="scan-card collscan">
+              <div class="scan-card-header">
+                <span class="stage-tag red">Stage: COLLSCAN</span>
+                <h3>Without Index (Linear Scan)</h3>
+              </div>
+              <div class="scan-metric-row">
+                <span class="lbl">Docs Examined:</span>
+                <span class="val red" id="collscan-docs-examined">50,000 docs</span>
+              </div>
+              <div class="scan-metric-row">
+                <span class="lbl">Keys Examined:</span>
+                <span class="val red">0 keys</span>
+              </div>
+              <div class="scan-metric-row">
+                <span class="lbl">Execution Time:</span>
+                <span class="val red" id="collscan-time">38.40 ms</span>
+              </div>
+              <div class="scan-metric-row">
+                <span class="lbl">Time Complexity:</span>
+                <span class="val red">O(N)</span>
+              </div>
+              <div class="scan-metric-row">
+                <span class="lbl">Disk I/O Cost:</span>
+                <span class="val red">Reads All Blocks</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill red" id="bar-collscan" style="width: 100%;"></div>
+              </div>
+              <p class="scan-explanation">MongoDB sequentially checks every record from document #1 to document #50,000 until match is confirmed.</p>
+            </div>
+
+            <!-- IXSCAN Card -->
+            <div class="scan-card ixscan">
+              <div class="scan-card-header">
+                <span class="stage-tag green">Stage: IXSCAN &rarr; FETCH</span>
+                <h3>With Index on rollNo (B-Tree)</h3>
+              </div>
+              <div class="scan-metric-row">
+                <span class="lbl">Docs Examined:</span>
+                <span class="val green" id="ixscan-docs-examined">1 doc</span>
+              </div>
+              <div class="scan-metric-row">
+                <span class="lbl">Keys Examined:</span>
+                <span class="val green">1 key</span>
+              </div>
+              <div class="scan-metric-row">
+                <span class="lbl">Execution Time:</span>
+                <span class="val green" id="ixscan-time">0.05 ms (768x faster)</span>
+              </div>
+              <div class="scan-metric-row">
+                <span class="lbl">Time Complexity:</span>
+                <span class="val green">O(log N)</span>
+              </div>
+              <div class="scan-metric-row">
+                <span class="lbl">Disk I/O Cost:</span>
+                <span class="val green">Target Block Only</span>
+              </div>
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill green" id="bar-ixscan" style="width: 0.3%;"></div>
+              </div>
+              <p class="scan-explanation">MongoDB traverses the <code>rollNo</code> B-Tree in ~15 pointer hops, directly fetching the exact document.</p>
+            </div>
+          </div>
+
+          <!-- B-Tree Visualizer Diagram -->
+          <div class="btree-visualizer">
+            <h3 class="visualizer-title">B-Tree Index Data Structure Visualization (rollNo)</h3>
+            <div class="btree-diagram">
+              <div class="btree-level root">
+                <div class="btree-node">
+                  <span class="key-item">23CM001</span>
+                  <span class="divider">|</span>
+                  <span class="key-item">23CS015</span>
+                  <span class="divider">|</span>
+                  <span class="key-item">23EC010</span>
+                </div>
+              </div>
+              <div class="tree-connectors">
+                <div class="branch-line"></div>
+                <div class="branch-line"></div>
+                <div class="branch-line"></div>
+              </div>
+              <div class="btree-level leaves">
+                <div class="btree-leaf active-match">
+                  <span class="leaf-key">23CM001</span>
+                  <span class="ptr">&rarr; Document #1</span>
+                </div>
+                <div class="btree-leaf">
+                  <span class="leaf-key">23CM002</span>
+                  <span class="ptr">&rarr; Document #2</span>
+                </div>
+                <div class="btree-leaf">
+                  <span class="leaf-key">23CS015</span>
+                  <span class="ptr">&rarr; Document #3</span>
+                </div>
+                <div class="btree-leaf">
+                  <span class="leaf-key">23DS007</span>
+                  <span class="ptr">&rarr; Document #8</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: Raw MongoDB Shell Code Script -->
+    <div class="tab-pane" id="pane-raw-queries">
+      <div class="queries-viewer-card">
+        <div class="queries-viewer-header">
+          <div>
+            <h2>collegeDB.mongodb.js</h2>
+            <p>Official MongoDB Shell script with all 12 operations ready to run in <code>mongosh</code> or MongoDB Compass.</p>
+          </div>
+          <div class="viewer-actions">
+            <button class="btn btn-outline" id="btn-copy-all-script">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy Full Script
+            </button>
+            <button class="btn btn-primary" id="btn-download-script">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download .js File
+            </button>
+          </div>
+        </div>
+
+        <div class="code-editor-mock">
+          <pre><code class="language-javascript" id="full-script-content">
+// Loading MongoDB script...
+          </code></pre>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL: Add / Edit Student -->
+  <div class="modal-backdrop hidden" id="student-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-title">Add New Student Document</h3>
+        <button class="modal-close-btn" id="btn-close-modal">&times;</button>
+      </div>
+      <form id="student-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="form-rollNo">Roll Number *</label>
+            <input type="text" id="form-rollNo" placeholder="e.g. 23CM001" required>
+            <span class="field-hint">Must be unique (Indexed field)</span>
+          </div>
+
+          <div class="form-group">
+            <label for="form-name">Full Name *</label>
+            <input type="text" id="form-name" placeholder="e.g. Ravi Kumar" required>
+          </div>
+
+          <div class="form-group">
+            <label for="form-branch">Branch *</label>
+            <input type="text" id="form-branch" placeholder="e.g. CSE-AIML, CSE, ECE" required>
+          </div>
+
+          <div class="form-group">
+            <label for="form-year">Academic Year *</label>
+            <select id="form-year" required>
+              <option value="1">1st Year</option>
+              <option value="2">2nd Year</option>
+              <option value="3" selected>3rd Year</option>
+              <option value="4">4th Year</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="form-marks">Marks (0 - 100) *</label>
+            <input type="number" id="form-marks" min="0" max="100" placeholder="e.g. 85" required>
+          </div>
+
+          <div class="form-group">
+            <label for="form-email">Email Address *</label>
+            <input type="email" id="form-email" placeholder="e.g. ravi@example.com" required>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" id="btn-cancel-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-student">Save Document</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Update Student Marks -->
+  <div class="modal-backdrop hidden" id="update-marks-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Update Student Marks</h3>
+        <button class="modal-close-btn" id="btn-close-marks-modal">&times;</button>
+      </div>
+      <form id="update-marks-form">
+        <p class="modal-info">Updating marks for roll number: <strong id="update-marks-roll-display"></strong></p>
+        <div class="form-group">
+          <label for="update-marks-input">New Marks (0 - 100) *</label>
+          <input type="number" id="update-marks-input" min="0" max="100" required>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" id="btn-cancel-marks-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Execute updateOne()</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Update Fields (Email & Branch) -->
+  <div class="modal-backdrop hidden" id="update-fields-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Update Email & Branch</h3>
+        <button class="modal-close-btn" id="btn-close-fields-modal">&times;</button>
+      </div>
+      <form id="update-fields-form">
+        <p class="modal-info">Updating fields for: <strong id="update-fields-roll-display"></strong></p>
+        <div class="form-group">
+          <label for="update-branch-input">Branch *</label>
+          <input type="text" id="update-branch-input" required>
+        </div>
+        <div class="form-group">
+          <label for="update-email-input">Email *</label>
+          <input type="email" id="update-email-input" required>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" id="btn-cancel-fields-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Execute updateOne()</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
